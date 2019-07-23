@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<title>人工智障系统</title>
+<link rel="stylesheet" href="/layui-v2.5.4/layui/css/layui.css" />
+<style type="text/css">
+.hidden {
+	display: none
+}
+
+.show {
+	display: block;
+}
+
+div {
+	margin: 20px;
+}
+</style>
+</head>
+
+<body>
+	<div>
+		<div class="layui-elem-quote">
+			<p>您好我是人工智障系统---小障，请问您要和我聊天吗？</p>
+		</div>
+		<div>
+			<input type="text" id="message" name="title" lay-verify="required"
+				placeholder="请输入您要和我说的话" autocomplete="off"
+				class="layui-input hidden" />
+		</div>
+		<div>
+			<input class="layui-btn" type="button" id="btnConnection" value="确认" />
+			<input class="layui-btn hidden" type="button" id="btnSend"
+				value="biu~发送！" /> <input class="layui-btn hidden" type="button"
+				id="btnClose" value="退出系统 " />
+		</div>
+	</div>
+	<script src="/js/jquery-3.4.1.min.js" type="text/javascript"></script>
+	<script src="/layer-v3.1.1/layer/layer.js"></script>
+	<script src="/layui-v2.5.4/layui/layui.js"></script>
+	<script type="text/javascript">
+		var socket;
+		if (typeof (WebSocket) == "undefined") {
+			layer.alert("您的浏览器不支持和我聊天")
+		}
+
+		$("#btnConnection").click(function() {
+
+			//实现化WebSocket对象，指定要连接的服务器地址与端口
+			socket = new WebSocket("ws://6e2922f1.ngrok.io/ws/asset");
+			//打开事件
+			socket.onopen = function() {
+				layer.alert('小障:见到你真的很高兴,您可以开始和我聊天啦!');
+				$("#message").removeClass("hidden");
+				$("#btnClose").removeClass("hidden");
+				$("#btnSend").removeClass("hidden");
+				$("#btnConnection").addClass("hidden");
+			};
+			//获得消息事件
+			socket.onmessage = function(msg) {
+				layer.alert(msg.data);
+			};
+			//关闭事件
+			socket.onclose = function() {
+				layer.alert('拜拜了您嘞');
+			};
+			//发生了错误事件
+			socket.onerror = function() {
+				layer.alert('啊玩坏了');
+			}
+		});
+
+		//发送消息
+		$("#btnSend").click(function() {
+			var message = $('#message').val();
+			socket.send(message);
+		});
+
+		//关闭
+		$("#btnClose").click(function() {
+			$("#message").addClass("hidden");
+			$("#btnClose").addClass("hidden");
+			$("#btnSend").addClass("hidden");
+			$("#btnConnection").removeClass("hidden");
+
+			socket.close();
+		});
+	</script>
+</body>
+
+</html>
